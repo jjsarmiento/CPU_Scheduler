@@ -1,0 +1,109 @@
+<html>
+	<head>
+		<style>
+			body {
+				font-family : Arial;
+			}
+			td {
+				padding : 0.3em;
+				text-align : center;
+			}
+			thead {
+				font-weight : bold;
+			}
+		</style>
+		<script src="js/jquery-3.1.0.min.js"></script>
+		<script>
+			$(document).ready(function(){
+				$('#INIT_COMPUTE').click(function(){
+					if(checkValues()){
+					}
+				});
+				$('#methods').change(function(){
+					location.href = $(this).val();
+				})
+			});
+			
+			function checkValues(){
+				var flag = true;
+				$('#cust_console').empty();			
+				$('.arrival_time').each(function(index){
+					// check if arrival_time is filled out
+					if($(this).val() == '' || !$.isNumeric($(this).val())){
+						$('#cust_console').append('Please input a number for Arrival Time for Process P'+(index+1)+'<br/>');
+						flag = false;
+					}
+				})
+				$('.burst_time').each(function(index){
+					// check if burst_time is filled out
+					if($(this).val() == '' || !$.isNumeric($(this).val())){
+						$('#cust_console').append('Please input a number for Burst Time for Process P'+(index+1)+'<br/>');
+						flag = false;
+					}
+				})
+				$('.priority').each(function(index){
+					// check if burst_time is filled out
+					if($(this).val() == '' || !$.isNumeric($(this).val())){
+						$('#cust_console').append('Please input a number for Priority for Process P'+(index+1)+'<br/>');
+						flag = false;
+					}
+				})
+				
+				return flag;
+			}
+		</script>
+	</head>
+	<body>
+		Scheduling Methods 
+		<select id="methods">
+			<option value="">SELECT A METHOD</option>
+			<option value="index.html">First Come, First Serve (FCFS)</option>
+			<option value="ShortestJobFirst.html">Shortest Job First</option>
+			<option value="ShortestTimeRemaining.html">Shortest Time Remaining</option>
+			<option value="PriorityNonPreemptive.html">Priority Non-Preemptive</option>
+			<option value="PriorityPreemptive.html">Priority Preemptive</option>
+			<option value="RoundRobin.html">Round Robin</option>
+		</select>
+		<br/>
+		<br/>
+		<h1>Priority - Preemptive</h1>
+		<table border="1">
+			<thead>
+				<tr>
+					<td>Process Name</td>
+					<td>Arrival Time</td>
+					<td>Burst Time</td>
+					<td>Priority</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>P1</td>
+					<td><input type="text" class="arrival_time" /></td>
+					<td><input type="text" class="burst_time" /></td>
+					<td><input type="text" class="priority" /></td>
+				</tr>
+				<tr>
+					<td>P2</td>
+					<td><input type="text" class="arrival_time" /></td>
+					<td><input type="text" class="burst_time" /></td>
+					<td><input type="text" class="priority" /></td>
+				</tr>
+				<tr>
+					<td>P3</td>
+					<td><input type="text" class="arrival_time" /></td>
+					<td><input type="text" class="burst_time" /></td>
+					<td><input type="text" class="priority" /></td>
+				</tr>
+				<tr>
+					<td>P4</td>
+					<td><input type="text" class="arrival_time" /></td>
+					<td><input type="text" class="burst_time" /></td>
+					<td><input type="text" class="priority" /></td>
+				</tr>
+			</tbody>
+		<table>
+		<p id="cust_console"></p>
+		<button id="INIT_COMPUTE">Compute</button>
+	</body>
+</html>
