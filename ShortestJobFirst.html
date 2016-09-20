@@ -1,29 +1,112 @@
 <html>
 	<head>
 		<style>
-			body {
-				font-family : Arial;
-			}
-			td {
-				padding : 0.3em;
-				text-align : center;
-			}
-			thead {
-				font-weight : bold;
-			}
+            body {
+                font-family : Arial;
+            }
+            td {
+                padding : 0.3em;
+                text-align : center;
+            }
+            thead {
+                font-weight : bold;
+            }
+            .gantt_block {
+                text-align: center;
+                padding: 0.4em;
+                height: 5em;
+                float: left;
+                display: block;
+                color: whitesmoke;
+                font-weight: bold;
+            }
+            table {
+                border-collapse : collapse;
+            }
 		</style>
 		<script src="js/jquery-3.1.0.min.js"></script>
 		<script>
+            var ready_queue = [];
+            var my_console = $('#cust_console');
+            var my_gantt_chart = $('#gantt_chart');
+            var my_colors = [
+                '#E74C3C',
+                '#8E44AD',
+                '#16A085',
+                '#D35400'
+            ];
+
 			$(document).ready(function(){
+                $('input').each(function(){
+                    $(this).val(Math.floor(Math.random() * 10) + 1);
+                });
 				$('#INIT_COMPUTE').click(function(){
 					if(checkValues()){
+                        my_console.empty();
+                        my_gantt_chart.empty();
+                        for(var i=0; i <= GET_BURSTTIME_TOTAL(); i++){
+                            // check for arrivals
+                            $('.arrival_time').each(function(index){
+                                var curr_arrival_time = Math.round(parseFloat($(this).val()));
+                                if(curr_arrival_time == parseFloat(i)){
+                                    var process_number = index+1;
+                                    var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
+                                    ready_queue.push(process_number+'?'+curr_bursttime);
+                                }
+                            });
+                        }
+                        // sort by burst time
+                        console.log(ready_queue);
+                        ready_queue.sort(function(a,b){
+                            return a.split('?')[1] - b.split('?')[1]
+                        });
+                        console.log(ready_queue);
 					}
 				});
 				$('#methods').change(function(){
 					location.href = $(this).val();
 				})
 			});
-			
+
+            function GET_BURSTTIME_HIGHEST(){
+                var x = 0;
+                $('.burst_time').each(function(index){
+                    var bt = parseFloat($(this).val());
+                    if(bt > 0){
+                        x = bt;
+                    }
+                });
+
+                return parseFloat(x);
+            }
+
+            function GET_BURSTTIME_TOTAL(){
+                var total = 0.0;
+                $('.burst_time').each(function(index){
+                    total += parseFloat($(this).val());
+                });
+
+                // check if for cpu waiting time
+                if(parseFloat(total) < GET_ARRIVALTIME_HIGHEST()){
+                    total = GET_ARRIVALTIME_HIGHEST();
+                }
+
+                return parseFloat(total);
+            }
+
+            function GET_ARRIVALTIME_HIGHEST(){
+                var highest = 0;
+                $('.arrival_time').each(function(){
+                    if(highest == 0){
+                        highest = parseFloat($(this).val());
+                    }
+                    if(parseFloat($(this).val()) > highest){
+                        highest = parseFloat($(this).val());
+                    }
+                });
+                return parseFloat(highest);
+            }
+
 			function checkValues(){
 				var flag = true;
 				$('#cust_console').empty();			
@@ -73,37 +156,48 @@
 					<td>Process Name</td>
 					<td>Arrival Time</td>
 					<td>Burst Time</td>
-					<td>Priority</td>
+					<td>Turn-Around Time</td>
+					<td>Waiting Time</td>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td>P1</td>
-					<td><input type="text" class="arrival_time" /></td>
-					<td><input type="text" class="burst_time" /></td>
-					<td><input type="text" class="priority" /></td>
-				</tr>
-				<tr>
-					<td>P2</td>
-					<td><input type="text" class="arrival_time" /></td>
-					<td><input type="text" class="burst_time" /></td>
-					<td><input type="text" class="priority" /></td>
-				</tr>
-				<tr>
-					<td>P3</td>
-					<td><input type="text" class="arrival_time" /></td>
-					<td><input type="text" class="burst_time" /></td>
-					<td><input type="text" class="priority" /></td>
-				</tr>
-				<tr>
-					<td>P4</td>
-					<td><input type="text" class="arrival_time" /></td>
-					<td><input type="text" class="burst_time" /></td>
-					<td><input type="text" class="priority" /></td>
-				</tr>
+                <tr>
+                    <td>P1</td>
+                    <td><input data-process="1" type="text" class="arrival_time" /></td>
+                    <td><input data-process="1" type="text" class="burst_time" /></td>
+                    <td><span class="TAT" id="P1_TAT"></span></td>
+                    <td><span class="WT" id="P1_WT"></span></td>
+                </tr>
+                <tr>
+                    <td>P2</td>
+                    <td><input data-process="2" type="text" class="arrival_time" /></td>
+                    <td><input data-process="2" type="text" class="burst_time" /></td>
+                    <td><span class="TAT" id="P2_TAT"></span></td>
+                    <td><span class="WT" id="P2_WT"></span></td>
+                </tr>
+                <tr>
+                    <td>P3</td>
+                    <td><input data-process="3" type="text" class="arrival_time" /></td>
+                    <td><input data-process="3" type="text" class="burst_time" /></td>
+                    <td><span class="TAT" id="P3_TAT"></span></td>
+                    <td><span class="WT" id="P3_WT"></span></td>
+                </tr>
+                <tr>
+                    <td>P4</td>
+                    <td><input data-process="4" type="text" class="arrival_time" /></td>
+                    <td><input data-process="4" type="text" class="burst_time" /></td>
+                    <td><span class="TAT" id="P4_TAT"></span></td>
+                    <td><span class="WT" id="P4_WT"></span></td>
+                </tr>
 			</tbody>
-		<table>
-		<p id="cust_console"></p>
-		<button id="INIT_COMPUTE">Compute</button>
+		</table>
+        <br/>
+        <div style="width: 80%">
+            <div id="gantt_chart">
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <p id="cust_console" style="color:red;"></p>
+        <button id="INIT_COMPUTE">Compute</button>
 	</body>
 </html>

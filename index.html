@@ -29,7 +29,6 @@
 			$(document).ready(function(){
 				$('#INIT_COMPUTE').click(function(){
 					if(checkValues()){
-                        GET_ARRIVALTIME_LOWEST();
                         var ready_queue = [];   // contains process index
                         var my_console = $('#cust_console');
                         var my_gantt_chart = $('#gantt_chart');
@@ -130,19 +129,6 @@
                     }
                 });
                 return parseFloat(highest);
-            }
-
-            function GET_BURSTTIME_LOWEST(){
-                var lowest = 0;
-                $('.burst_time').each(function(){
-                    if(lowest == 0){
-                        lowest = parseFloat($(this).val());
-                    }
-                    if(parseFloat($(this).val()) < lowest){
-                        lowest = parseFloat($(this).val());
-                    }
-                });
-                return parseFloat(lowest);
             }
 
             function GET_ARRIVALTIME_LOWEST(){
