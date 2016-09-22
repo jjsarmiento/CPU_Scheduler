@@ -23,6 +23,11 @@
             table {
                 border-collapse : collapse;
             }
+            .bubble {
+                -webkit-box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
+                -moz-box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
+                box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
+            }
 		</style>
 		<script src="js/jquery-3.1.0.min.js"></script>
 		<script>
@@ -68,7 +73,7 @@
 
                             // check for CPU STAND BY
                             if(curr_arrivaltime > start_time){
-                                my_gantt_chart.append('<div class="gantt_block" style="background-color: white; width: 10%; border: 1px solid #333333; color: black;">CPU STANDBY<br/>'+start_time+' - '+curr_arrivaltime+'</div>');
+                                my_gantt_chart.append('<div class="gantt_block bubble" style="background-color: white; width: 10%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+start_time+' - '+curr_arrivaltime+'</div>');
                                 start_time = parseFloat(curr_arrivaltime);
                             }
 
