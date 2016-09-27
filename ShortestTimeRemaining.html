@@ -53,30 +53,75 @@
 
 				$('#INIT_COMPUTE').click(function(){
 					if(checkValues()){
-                        for(var i=0; i < GET_BURSTTIME_TOTAL(); i++){
-                            $('.arrival_time').each(function(index){ // check for arrivals
-                                var curr_arrival_time = Math.round(parseFloat($(this).val()));
-                                if(curr_arrival_time == parseFloat(i)){
-                                    var process_number = index+1;
-                                    var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
-                                    ready_queue.push(process_number+'?'+curr_bursttime);
+                        for(var i=0; i <= GET_BURSTTIME_TOTAL(); i++){
+                            PROCESS_ARRIVALS(i);
+                            if(cpu_process == null){ // no on going process
+                                if(ready_queue.length > 0){ // ready queue has process to be done
+                                    SORT_READY_QUEUE();
+                                    cpu_process = ready_queue[0].split('?')[0];
+                                    cpu_bursttime = ready_queue[0].split('?')[1];
+                                    GLOBAL_startTime = i;
+                                    ready_queue.shift(); // removes process form ready queue
+                                    console.log(i+' : INSERT PR TO CPU : '+cpu_process+'/'+cpu_bursttime);
+                                }else{ // bubble time
+                                    console.log(i+' : BUBBLE : BUBBLE');
                                 }
-                            });
+                            }else{ // on going process
+                                if(cpu_bursttime > 0){
+                                    var og_temp_bt = -1;
+                                    var og_temp_pr = -1;
 
-                            if(cpu_process == null){ // if the cpu has no on going process
-                                ready_queue.sort(function(a,b){ // sort queue by lowest bt first
-                                    return a.split('?')[1] - b.split('?')[1]
-                                });
-                                if(ready_queue.length != 0){ // if ready queue has process waiting
-                                    var temp_bt = ready_queue[0].split('?')[1];
-                                    var temp_pr = ready_queue[0].split('?')[0];
-                                    if(cpu_process == null){
-                                        cpu_process = temp_pr;
-                                        cpu_bursttime = temp_bt;
+                                    if(ready_queue.length > 0){ // initialize values from ready queue for checking
+                                        SORT_READY_QUEUE();
+                                        og_temp_pr = ready_queue[0].split('?')[0];
+                                        og_temp_bt = ready_queue[0].split('?')[1];
                                     }
-                                }
-                            }else{
 
+                                    console.log(i+' : CHECK Q : '+cpu_process+'/'+cpu_bursttime+' | '+og_temp_pr+'/'+og_temp_bt);
+
+                                    if(og_temp_bt < cpu_bursttime && og_temp_bt != -1 && og_temp_pr != -1) { // if lowest bt process on rq has lower bt than in the CPU
+                                        var bt_of_process = GET_BT_OF_PROCESS(cpu_process);
+                                        var curr_width = ((bt_of_process / GET_BURSTTIME_TOTAL()) * 80);
+                                        $('#gantt_chart').append('<div class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
+
+                                        ready_queue.push(cpu_process+'?'+cpu_bursttime);
+//                                        INSET_GANTT_DIVISION(cpu_process);
+                                        cpu_bursttime = og_temp_bt;
+                                        cpu_process = og_temp_pr;
+                                        ready_queue.shift();
+                                        SORT_READY_QUEUE();
+                                        GLOBAL_startTime = i;
+                                        console.log(i+' : CHANGE PROCESS : '+cpu_process+'/'+cpu_bursttime);
+                                    }
+
+                                    cpu_bursttime--;
+                                    GLOBAL_endTime = i;
+                                    console.log(i+' : DECREMENT : '+cpu_process+'/'+cpu_bursttime);
+
+                                    if(cpu_bursttime == 0){
+//                                    INSET_GANTT_DIVISION(cpu_process)
+                                        var bt_of_process = GET_BT_OF_PROCESS(cpu_process);
+                                        var curr_width = ((bt_of_process / GET_BURSTTIME_TOTAL()) * 80);
+                                        $('#gantt_chart').append('<div class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
+
+                                        if(ready_queue.length > 0){ // ready queue has process to be done
+                                            SORT_READY_QUEUE();
+                                            cpu_process = ready_queue[0].split('?')[0];
+                                            cpu_bursttime = ready_queue[0].split('?')[1];
+                                            GLOBAL_startTime = i;
+                                            ready_queue.shift(); // removes process form ready queue
+                                            console.log(i+' : INSERT PR TO CPU : '+cpu_process+'/'+cpu_bursttime);
+                                        }else{ // bubble time
+                                            console.log(i+' : BUBBLE : BUBBLE');
+                                        }
+
+//                                    cpu_bursttime = null;
+//                                    cpu_process = null;
+                                        GLOBAL_startTime = i;
+                                        console.log(i+' : PR DONE / INSERT NEW PR : '+cpu_process+'/'+cpu_bursttime);
+                                    }
+
+                                }
                             }
                         }
 					}
@@ -86,8 +131,33 @@
 				})
 			});
 
-            function GET_PROCESS_WITH_LOWEST_BT(){
+            function INSET_GANTT_DIVISION(process){
+                var bt_of_process = GET_BT_OF_PROCESS(process);
+                var curr_width = ((bt_of_process / GET_BURSTTIME_TOTAL()) * 80);
+                $('#gantt_chart').append('<div class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
+            }
 
+            function PROCESS_ARRIVALS(time){
+                $('.arrival_time').each(function(index){ // check for arrivals
+                    var curr_arrival_time = Math.round(parseFloat($(this).val()));
+                    if(curr_arrival_time == parseFloat(time)){
+                        var process_number = index+1;
+                        var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
+                        ready_queue.push(process_number+'?'+curr_bursttime);
+                        console.log(time+' : PROCESS ARRIVED : '+process_number+'/'+curr_bursttime+' | '+ready_queue);
+                        SORT_READY_QUEUE();
+                    }
+                });
+            }
+
+            function SORT_READY_QUEUE(){
+                ready_queue.sort(function(a,b){ // sort queue by lowest bt first
+                    return a.split('?')[1] - b.split('?')[1]
+                });
+            }
+
+            function GET_BT_OF_PROCESS(cpu){
+                return parseFloat(Math.round($('[data-process="'+(cpu)+'"][class="burst_time"]').val()));
             }
 
             function GET_BURSTTIME_TOTAL(){
@@ -99,6 +169,10 @@
                 // adjust bt by the lowest bt in case lowest BT is not equal to zero
                 if(GET_BURSTTIME_LOWEST() != 0){
                     total += GET_BURSTTIME_LOWEST();
+                }
+
+                if(GET_ARRIVALTIME_HIGHEST() > total){
+                    total = GET_ARRIVALTIME_HIGHEST();
                 }
 
                 return parseFloat(total);
