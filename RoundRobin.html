@@ -1,135 +1,321 @@
 <html>
 <head>
-    <style>
-        body {
-            font-family : Arial;
-        }
-        td {
-            padding : 0.3em;
-            text-align : center;
-        }
-        thead {
-            font-weight : bold;
-        }
-        .gantt_block {
-            text-align: center;
-            padding: 0.4em;
-            height: 5em;
-            float: left;
-            display: block;
-            color: whitesmoke;
-            font-weight: bold;
-        }
-        table {
-            border-collapse : collapse;
-        }
-        .bubble {
-            -webkit-box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
-            -moz-box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
-            box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
-        }
-    </style>
-    <script src="js/jquery-3.1.0.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $('#INIT_COMPUTE').click(function(){
-                if(checkValues()){
-                    var ready_queue = [];   // contains process index
-                    var my_console = $('#cust_console');
-                    var my_gantt_chart = $('#gantt_chart');
-                    var my_colors = [
-                        '#E74C3C',
-                        '#8E44AD',
-                        '#16A085',
-                        '#D35400'
-                    ];
+<style>
+    body {
+        font-family : Arial;
+    }
+    td {
+        padding : 0.3em;
+        text-align : center;
+    }
+    thead {
+        font-weight : bold;
+    }
+    .gantt_block {
+        text-align: center;
+        padding: 0.4em;
+        height: 5em;
+        float: left;
+        display: block;
+        color: whitesmoke;
+        font-weight: bold;
+    }
+    table {
+        border-collapse : collapse;
+    }
+    .bubble {
+        -webkit-box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
+        -moz-box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
+        box-shadow: 0px 0px 21px 1px rgba(0,0,0,0.84);
+        text-align: center;
+        padding: 0.4em;
+        height: 5em;
+        float: left;
+        display: block;
+        color: whitesmoke;
+        font-weight: bold;
+    }
+</style>
+<script src="js/jquery-3.1.0.min.js"></script>
+<script>
+var ready_queue = [];
+var cpu_process = null;
+var cpu_bursttime = null;
+var GLOBAL_startTime = null;
+var GLOBAL_endTime = null;
+var GLOBAL_bubbleStart = null;
+var GLOBAL_bubbleEnd = null;
+var my_console = $('#cust_console');
+var my_gantt_chart = $('#gantt_chart');
+var my_colors = [
+    '#E74C3C',
+    '#8E44AD',
+    '#16A085',
+    '#D35400'
+];
+var pr_done = 0;
+var quantum = 0;
+var burst_counter = 0;
+$(document).ready(function(){
 
-                    my_console.empty();
-                    my_gantt_chart.empty();
+    $('input').each(function(){
+        $(this).val(Math.floor(Math.random() * 10) + 1);
+    });
+    $('#quantum').val(Math.floor(Math.random() * 5) + 1);
 
-                    // populate `ready_queue` array of process via arrival time values
-                    for(var x=0; x <= GET_BURSTTIME_TOTAL(); x++){
-                        $('.arrival_time').each(function(index){
-                            if(parseFloat(x) == parseFloat($(this).val())){
-                                ready_queue.push((index+1));
-                            }
-                        });
+    $('#INIT_COMPUTE').click(function(){
+        if(checkValues()){
+            var i = GET_ARRIVALTIME_LOWEST();
+            quantum = $('#quantum').val();
+
+            do{
+                PROCESS_ARRIVALS(i); // insert process to `ready_queue`
+
+                if(cpu_process != null){
+                    cpu_bursttime--; // decrement value
+                    burst_counter++;
+                    console.log(i+'\t: DCRMNT BT : P'+cpu_process+'/'+cpu_bursttime);
+
+                    if(burst_counter == quantum || cpu_bursttime == 0){ // cpu has 0 bt value
+                        GLOBAL_endTime = i; // change end time to loop value `i`
+                        var bt_of_process = parseFloat(GLOBAL_endTime - GLOBAL_startTime);
+                        var curr_width = ((bt_of_process / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
+                        $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
+                        console.log(i+'\t: '+' ADD_GANTT_1 = '+cpu_process+'/'+cpu_bursttime);
+                        if(cpu_bursttime > 0){
+                            ready_queue.push(cpu_process+'?'+cpu_bursttime);
+                        }else if(cpu_bursttime == 0){
+                            pr_done++;
+                        }
+                        cpu_process = null;
+                        cpu_bursttime = null;
+
+                        GLOBAL_startTime = i;
+                        burst_counter = 0;
                     }
+                }
 
-                    // start processing
-                    var start_time = GET_ARRIVALTIME_LOWEST();
-                    var end_time = 0;
-                    $.each(ready_queue, function(index, value){
-                        // TAT = TF - TA
-                        // WT = TS - TA
-                        var curr_process = 'P'+value;
-                        var curr_arrivaltime = $('[data-process="P'+value+'"][class="arrival_time"]').val();
-                        var curr_bursttime = $('[data-process="P'+value+'"][class="burst_time"]').val();
-//                            var curr_width = (() / parseFloat(curr_bursttime) * 100.00);
-                        var curr_width = (curr_bursttime / parseFloat(GET_BURSTTIME_TOTAL())) * 80;
-                        console.log(curr_width);
-                        var elem_TAT = $('#'+curr_process+'_TAT');
-                        var elem_WT = $('#'+curr_process+'_WT');
+                if(cpu_process == null){
+                    if(ready_queue.length > 0){
+                        cpu_process = ready_queue[0].split('?')[0];	// add process to cpu
+                        cpu_bursttime = ready_queue[0].split('?')[1];
+                        ready_queue.shift();
+                        GLOBAL_startTime = i;
+                        burst_counter = 0;
 
-                        // check for CPU STAND BY
-                        if(curr_arrivaltime > start_time){
-                            my_gantt_chart.append('<div class="gantt_block bubble" style="background-color: white; width: 10%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+start_time+' - '+curr_arrivaltime+'</div>');
-                            start_time = parseFloat(curr_arrivaltime);
+                        if(GLOBAL_bubbleStart != null){
+                            console.log(i+'\t: BUBBLE END');
+                            var bubble_width = ((i - GLOBAL_bubbleStart) / GET_BURSTTIME_SUM()) * 80;
+                            $('#gantt_chart').append('<div class="bubble" style="background-color: white; width: '+bubble_width+'%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+GLOBAL_bubbleStart+' - '+i+'</div>');
+                            GLOBAL_bubbleStart = null;
                         }
 
-                        end_time = start_time + parseFloat(curr_bursttime);
-                        // create gantt chart
-                        my_gantt_chart.append('<div class="gantt_block" style="background-color: '+my_colors[index]+'; width: '+curr_width+'%;">'+curr_process+'<br/>'+start_time+' - '+end_time+'</div>');
-                        // get and append TAT
-                        var TAT = end_time - curr_arrivaltime;
-                        elem_TAT.empty().append(TAT);
-                        // get and append WT
-                        var WT = start_time - curr_arrivaltime;
-                        elem_WT.empty().append(WT);
-                        start_time = end_time;
-                    });
+                        console.log(i+'\t: ADD PR to CPU : P'+cpu_process+'/'+cpu_bursttime);
+                    }else{ // bubble
+                        if(GLOBAL_bubbleStart == null){
+                            GLOBAL_bubbleStart = i;
+                        }
+                        console.log(i+'\t: BUBBLE INC - Start = '+GLOBAL_bubbleStart);
+                    }
+                }
+                /*else{
+                    // algo for change process - PREEMPTIVE NATURE
+                    if(ready_queue.length > 0){
+                        var og_temp_pr = ready_queue[0].split('?')[0]; // get and put process from ready_queue to temp value
+                        var og_temp_bt = ready_queue[0].split('?')[1]; // get and put burst time from ready_queue to temp value
+                        if(og_temp_bt < cpu_bursttime){ // determines if cpu will change to lower bt process
+                            GLOBAL_endTime = i; // change end time to loop value `i`
+                            var bt_of_process = parseFloat(GLOBAL_endTime - GLOBAL_startTime); // get burst time of process
+                            var curr_width = ((bt_of_process / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
+                            $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
+                            console.log(i+'\t: '+' ADD_GANTT_2 = '+cpu_process+'/'+cpu_bursttime);
 
-                    // compute average of TAT
-                    var total_tat = 0;
-                    $('.TAT').each(function(index, value){
-                        total_tat += parseFloat($(this).text());
-                    });
-                    $('#AVG_TAT').empty().append((parseFloat(total_tat)/parseFloat(ready_queue.length)));
-                    // compute average WT
-                    var total_wt = 0;
-                    $('.WT').each(function(index, value){
-                        total_wt += parseFloat($(this).text());
-                    });
-                    $('#AVG_WT').empty().append((parseFloat(total_wt)/parseFloat(ready_queue.length)));
+                            // change process
+                            console.log(i+'\t: CHNG PR : P'+cpu_process+'/'+cpu_bursttime+' to '+og_temp_pr+'/'+og_temp_bt);
+                            ready_queue.push(cpu_process+'?'+cpu_bursttime); // put back process from cpu to ready_queue
+                            cpu_process = og_temp_pr; // apply new cpu process
+                            cpu_bursttime = og_temp_bt; // apply new cpu burst time
+                            ready_queue.shift(); // remove applied process from ready_queue
+                            GLOBAL_startTime = i;
+                        }
+                    }
+                }
+                */
+                i++;
+            }while(pr_done < 4);
 
+            console.log('GANTT LENGTH : '+$('.gantt_block').length);
+            var et_array_p = [];
+            var et_array_e = [];
+            $('.gantt_block').each(function (index) {
+                var tmp_process = parseFloat($(this).data('process'));
+                var tmp_start = parseFloat($(this).data('start'));
+                var tmp_end = parseFloat($(this).data('end'));
+                var tmp_arrival = parseFloat($('[data-process="'+(tmp_process)+'"][class="arrival_time"]').val());
+                // selectors
+                var slctr_tat = $('#P'+tmp_process+'_TAT');
+                var slctr_wt = $('#P'+tmp_process+'_WT');
+
+                slctr_tat.empty().append(tmp_end - tmp_arrival);
+
+                var curr_wt = slctr_wt.text();
+                if(curr_wt == ''){
+                    slctr_wt.append(tmp_start - tmp_arrival);
+                    et_array_p.push(tmp_process);
+                    et_array_e.push(tmp_end);
+                }else{
+                    var inArray = $.inArray(tmp_process, et_array_p);
+                    console.log(et_array_e[inArray]);
+                    slctr_wt.empty().append(parseFloat(curr_wt) + (tmp_start - et_array_e[inArray]));
                 }
             });
-            $('#methods').change(function(){
-                location.href = $(this).val();
-            })
-        });
 
-        function checkValues(){
-            var flag = true;
-            $('#cust_console').empty();
-            $('.arrival_time').each(function(index){
-                // check if arrival_time is filled out
-                if($(this).val() == '' || !$.isNumeric($(this).val())){
-                    $('#cust_console').append('Please input a number for Arrival Time for Process P'+(index+1)+'<br/>');
-                    flag = false;
-                }
+            var total_tat = 0;
+            $('.TAT').each(function (index) {
+                total_tat += parseFloat($(this).text());
             });
-            $('.burst_time').each(function(index){
-                // check if burst_time is filled out
-                if($(this).val() == '' || !$.isNumeric($(this).val())){
-                    $('#cust_console').append('Please input a number for Burst Time for Process P'+(index+1)+'<br/>');
-                    flag = false;
-                }
-            });
+            $('#AVG_TAT').empty().append((parseFloat(total_tat)/$('.TAT').length));
 
-            return flag;
+            var total_wt = 0;
+            $('.WT').each(function (index) {
+                total_wt += parseFloat($(this).text());
+            });
+            $('#AVG_WT').empty().append((parseFloat(total_wt)/$('.WT').length));
         }
-    </script>
+    });
+
+    $('#methods').change(function(){
+        location.href = $(this).val();
+    })
+});
+
+function checkValues(){
+    var flag = true;
+    $('#cust_console').empty();
+    $('.arrival_time').each(function(index){
+        // check if arrival_time is filled out
+        if($(this).val() == '' || !$.isNumeric($(this).val())){
+            $('#cust_console').append('Please input a number for Arrival Time for Process P'+(index+1)+'<br/>');
+            flag = false;
+        }
+    })
+    $('.burst_time').each(function(index){
+        // check if burst_time is filled out
+        if($(this).val() == '' || !$.isNumeric($(this).val())){
+            $('#cust_console').append('Please input a number for Burst Time for Process P'+(index+1)+'<br/>');
+            flag = false;
+        }
+    })
+    $('.priority').each(function(index){
+        // check if burst_time is filled out
+        if($(this).val() == '' || !$.isNumeric($(this).val())){
+            $('#cust_console').append('Please input a number for Priority for Process P'+(index+1)+'<br/>');
+            flag = false;
+        }
+    })
+
+    switch ($('#quantum').val()){
+        case '' :
+        case '0'  :
+            $('#cust_console').append('Please input a number Q (Quantum)<br/>');
+            flag = false;
+            break;
+        default :
+            break;
+    }
+
+    return flag;
+}
+
+function GET_BT_OF_PROCESS(cpu){
+    return parseFloat(Math.round($('[data-process="'+(cpu)+'"][class="burst_time"]').val()));
+}
+
+function GET_ARRIVALTIME_LOWEST(){
+    var lowest = GET_ARRIVALTIME_HIGHEST();
+    $('.arrival_time').each(function(){
+        if(parseFloat($(this).val()) < lowest){
+            lowest = parseFloat($(this).val());
+        }
+    });
+
+    return lowest;
+}
+
+function GET_PROCESSTIME(){
+
+}
+
+function GET_ARRIVALTIME_HIGHEST(){
+    var highest = 0;
+    $('.arrival_time').each(function(){
+        if(highest == 0){
+            highest = parseFloat($(this).val());
+        }
+        if(parseFloat($(this).val()) > highest){
+            highest = parseFloat($(this).val());
+        }
+    });
+    return parseFloat(highest);
+}
+
+function GET_BURSTTIME_SUM(){
+    var total = 0.0;
+    $('.burst_time').each(function(index){
+        total += parseFloat($(this).val());
+    });
+
+    return (total + GET_ARRIVALTIME_LOWEST());
+}
+
+function GET_PR_WITH_HIGHEST_AT_AND_BT(){
+    var procAndBT = null;
+    $('.arrival_time').each(function(index){ // check for arrivals
+        var curr_arrival_time = Math.round(parseFloat($(this).val()));
+        var highest = 0;
+        if(curr_arrival_time > highest){
+            highest = curr_arrival_time;
+            procAndBT = [$(this).data('process'), parseFloat(highest)];
+        }
+    });
+
+    return procAndBT;
+}
+
+function PROCESS_ARRIVALS(time){
+    var arrival_flag = false;
+    $('.arrival_time').each(function(index){ // check for arrivals
+        var curr_arrival_time = Math.round(parseFloat($(this).val()));
+        if(curr_arrival_time == parseFloat(time)){
+            var process_number = index+1;
+            var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
+            ready_queue.push(process_number+'?'+curr_bursttime);
+            console.log(time+'\t: PR ARRVD : '+process_number+'/'+curr_bursttime+' | '+ready_queue);
+            arrival_flag = true;
+        }
+    });
+    return arrival_flag;
+}
+
+function GET_BURSTTIME_TOTAL(){
+    var total = 0.0;
+    $('.burst_time').each(function(index){
+        total += parseFloat($(this).val());
+    });
+
+    if(GET_ARRIVALTIME_HIGHEST() > total){
+        total = GET_ARRIVALTIME_HIGHEST();
+    }
+
+    return parseFloat(total);
+}
+
+function SORT_READY_QUEUE(){
+    ready_queue.sort(function(a,b){ // sort queue by lowest bt first
+        return a.split('?')[1] - b.split('?')[1]
+    });
+}
+</script>
 </head>
 <body>
 Scheduling Methods
@@ -144,7 +330,7 @@ Scheduling Methods
 </select>
 <br/>
 <br/>
-<h1>Round Robin</h1>
+<h1>Round Robin | Q = <input type="text" id="quantum" /></h1>
 <table border="1">
     <thead>
     <tr>
@@ -158,29 +344,29 @@ Scheduling Methods
     <tbody>
     <tr>
         <td>P1</td>
-        <td><input data-process="P1" type="text" class="arrival_time" /></td>
-        <td><input data-process="P1" type="text" class="burst_time" /></td>
+        <td><input data-process="1" type="text" class="arrival_time" /></td>
+        <td><input data-process="1" type="text" class="burst_time" /></td>
         <td><span class="TAT" id="P1_TAT"></span></td>
         <td><span class="WT" id="P1_WT"></span></td>
     </tr>
     <tr>
         <td>P2</td>
-        <td><input data-process="P2" type="text" class="arrival_time" /></td>
-        <td><input data-process="P2" type="text" class="burst_time" /></td>
+        <td><input data-process="2" type="text" class="arrival_time" /></td>
+        <td><input data-process="2" type="text" class="burst_time" /></td>
         <td><span class="TAT" id="P2_TAT"></span></td>
         <td><span class="WT" id="P2_WT"></span></td>
     </tr>
     <tr>
         <td>P3</td>
-        <td><input data-process="P3" type="text" class="arrival_time" /></td>
-        <td><input data-process="P3" type="text" class="burst_time" /></td>
+        <td><input data-process="3" type="text" class="arrival_time" /></td>
+        <td><input data-process="3" type="text" class="burst_time" /></td>
         <td><span class="TAT" id="P3_TAT"></span></td>
         <td><span class="WT" id="P3_WT"></span></td>
     </tr>
     <tr>
         <td>P4</td>
-        <td><input data-process="P4" type="text" class="arrival_time" /></td>
-        <td><input data-process="P4" type="text" class="burst_time" /></td>
+        <td><input data-process="4" type="text" class="arrival_time" /></td>
+        <td><input data-process="4" type="text" class="burst_time" /></td>
         <td><span class="TAT" id="P4_TAT"></span></td>
         <td><span class="WT" id="P4_WT"></span></td>
     </tr>
