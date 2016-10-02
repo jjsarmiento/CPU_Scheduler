@@ -1,0 +1,16 @@
+PRIORITY NON PREEMPTIVE
+
+loop {
+    check for arrivals and append to ready queue
+    sort ready queue (priority)
+
+    if cpu has no process | is null {
+        if ready_queue has process {
+            APPEND PROCESS TO CPU
+            COMPLETE PROCESS
+        }else if ready_queue has no process {
+            BUBBLE TIME
+        }
+    }else if cpu has process {
+    }
+}

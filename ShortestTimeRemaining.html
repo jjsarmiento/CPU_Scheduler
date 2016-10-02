@@ -91,7 +91,6 @@
                                     GLOBAL_startTime = i;
 
                                     if(GLOBAL_bubbleStart != null){
-                                        console.log();
                                         console.log(i+'\t: BUBBLE END');
                                         var bubble_width = ((i - GLOBAL_bubbleStart) / GET_BURSTTIME_SUM()) * 80;
                                         $('#gantt_chart').append('<div class="bubble" style="background-color: white; width: '+bubble_width+'%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+GLOBAL_bubbleStart+' - '+i+'</div>');
