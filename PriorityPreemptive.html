@@ -148,18 +148,18 @@
                     // selectors
                     var slctr_tat = $('#P'+tmp_process+'_TAT');
                     var slctr_wt = $('#P'+tmp_process+'_WT');
+                    var inArray = $.inArray(tmp_process, et_array_p);
 
                     slctr_tat.empty().append(tmp_end - tmp_arrival);
 
                     var curr_wt = slctr_wt.text();
-                    if(curr_wt == ''){
+                    if(inArray > -1){
+                        slctr_wt.empty().append(parseFloat(curr_wt) + (tmp_start - et_array_e[inArray]));
+                        et_array_e[inArray] = tmp_end;
+                    }else{
                         slctr_wt.append(tmp_start - tmp_arrival);
                         et_array_p.push(tmp_process);
                         et_array_e.push(tmp_end);
-                    }else{
-                        var inArray = $.inArray(tmp_process, et_array_p);
-                        console.log(et_array_e[inArray]);
-                        slctr_wt.empty().append(parseFloat(curr_wt) + (tmp_start - et_array_e[inArray]));
                     }
                 });
 
@@ -306,7 +306,7 @@
 Scheduling Methods
 <select id="methods">
     <option value="">SELECT A METHOD</option>
-    <option value="index.html">First Come, First Serve (FCFS)</option>
+    <option value="FirstComeFirstServe.html">First Come, First Serve (FCFS)</option>
     <option value="ShortestJobFirst.html">Shortest Job First</option>
     <option value="ShortestTimeRemaining.html">Shortest Time Remaining</option>
     <option value="PriorityNonPreemptive.html">Priority Non-Preemptive</option>
