@@ -78,6 +78,10 @@
                                     var curr_width = (((GLOBAL_endTime - GLOBAL_startTime) / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
                                     $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
                                     pr_done++;
+
+                                    var curr_arrivaltime = parseFloat($('[data-process="'+cpu_process+'"][class="arrival_time"]').val());
+                                    $('#P'+cpu_process+'_TAT').append(GLOBAL_endTime - curr_arrivaltime);
+                                    $('#P'+cpu_process+'_WT').append(GLOBAL_startTime - curr_arrivaltime);
                                     cpu_process = null;
                                     cpu_bursttime = null;
                                 }
@@ -107,6 +111,17 @@
                                 break;
                             }
                         }while(pr_done < 4);
+
+                        var total_TAT = 0;
+                        $('.TAT').each(function (index) {
+                            total_TAT += parseFloat($(this).text());
+                        });
+                        $('#AVG_TAT').empty().append((total_TAT/4));
+                        var total_WT = 0;
+                        $('.WT').each(function (index) {
+                            total_WT += parseFloat($(this).text());
+                        });
+                        $('#AVG_WT').empty().append((total_WT/4));
                     }
                 })
             });
