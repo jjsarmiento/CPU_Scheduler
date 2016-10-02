@@ -24,36 +24,8 @@
     <favorites_list name="FINAL PROJECT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.7329803">
+    <splitter split-orientation="horizontal" split-proportion="0.74583966">
       <split-first>
-        <leaf>
-          <file leaf-file-name="PriorityNonPreemptive.html" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/PriorityNonPreemptive.html">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.59799" vertical-offset="1291" max-vertical-offset="4432">
-                  <caret line="103" column="29" selection-start-line="103" selection-start-column="29" selection-end-line="103" selection-end-column="29" />
-                  <folding>
-                    <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                    <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-                    <element signature="n#style#0;n#p#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/index.html">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-7.245283" vertical-offset="992" max-vertical-offset="3968">
-                  <caret line="86" column="67" selection-start-line="86" selection-start-column="67" selection-end-line="86" selection-end-column="67" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
         <leaf>
           <file leaf-file-name="PSEUDOCODE.txt" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/PSEUDOCODE.txt">
@@ -65,11 +37,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ShortestTimeRemaining.html" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/ShortestTimeRemaining.html">
+          <file leaf-file-name="PriorityPreemptive.html" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/PriorityPreemptive.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.15344827" vertical-offset="1319" max-vertical-offset="5936">
-                  <caret line="88" column="81" selection-start-line="88" selection-start-column="81" selection-end-line="88" selection-end-column="81" />
+                <state vertical-scroll-proportion="0.33226836" vertical-offset="1248" max-vertical-offset="6144">
+                  <caret line="91" column="82" selection-start-line="91" selection-start-column="82" selection-end-line="91" selection-end-column="82" />
                   <folding>
                     <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                     <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -82,13 +54,31 @@
           <file leaf-file-name="PriorityNonPreemptive.html" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/PriorityNonPreemptive.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-3.7924528" vertical-offset="1751" max-vertical-offset="4432">
-                  <caret line="122" column="21" selection-start-line="122" selection-start-column="21" selection-end-line="122" selection-end-column="21" />
+                <state vertical-scroll-proportion="-3.4" vertical-offset="1291" max-vertical-offset="4432">
+                  <caret line="86" column="69" selection-start-line="0" selection-start-column="0" selection-end-line="271" selection-end-column="7" />
                   <folding>
                     <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                     <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                     <element signature="n#style#0;n#p#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                    <marker date="1475386692104" expanded="true" signature="2229:2324" placeholder="{...}" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="ShortestTimeRemaining.html" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/ShortestTimeRemaining.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.41284403" vertical-offset="338" max-vertical-offset="1856">
+                  <caret line="38" column="54" selection-start-line="38" selection-start-column="54" selection-end-line="294" selection-end-column="17" />
+                  <folding>
+                    <element signature="tag#script#1;tag#head#0;tag#html#0" expanded="false" />
+                    <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                    <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+                    <element signature="n#style#0;n#p#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -110,9 +100,10 @@
         <option value="$PROJECT_DIR$/ShortestJobFirst.html" />
         <option value="$PROJECT_DIR$/ShortestTimeRemaining-PSEUDOCODE.txt" />
         <option value="$PROJECT_DIR$/ShortestTimeRemaining_WIP.html" />
-        <option value="$PROJECT_DIR$/ShortestTimeRemaining.html" />
         <option value="$PROJECT_DIR$/PSEUDOCODE.txt" />
         <option value="$PROJECT_DIR$/PriorityNonPreemptive.html" />
+        <option value="$PROJECT_DIR$/ShortestTimeRemaining.html" />
+        <option value="$PROJECT_DIR$/PriorityPreemptive.html" />
       </list>
     </option>
   </component>
@@ -276,6 +267,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5808">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
+            <element signature="tag#script#1;tag#head#0;tag#html#0" expanded="false" />
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#p#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -298,6 +290,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5136">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
+            <element signature="tag#script#1;tag#head#0;tag#html#0" expanded="false" />
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#p#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -375,14 +368,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.245283" vertical-offset="992" max-vertical-offset="3968">
-          <caret line="86" column="67" selection-start-line="86" selection-start-column="67" selection-end-line="86" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PSEUDOCODE.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="336">
@@ -391,10 +376,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ShortestTimeRemaining.html">
+    <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15344827" vertical-offset="1319" max-vertical-offset="5936">
-          <caret line="88" column="81" selection-start-line="88" selection-start-column="81" selection-end-line="88" selection-end-column="81" />
+        <state vertical-scroll-proportion="0.6134185" vertical-offset="992" max-vertical-offset="3968">
+          <caret line="86" column="67" selection-start-line="86" selection-start-column="67" selection-end-line="86" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PriorityNonPreemptive.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.4" vertical-offset="1291" max-vertical-offset="4432">
+          <caret line="86" column="69" selection-start-line="0" selection-start-column="0" selection-end-line="271" selection-end-column="7" />
           <folding>
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -403,10 +396,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PriorityNonPreemptive.html">
+    <entry file="file://$PROJECT_DIR$/ShortestTimeRemaining.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.59799" vertical-offset="1291" max-vertical-offset="4432">
-          <caret line="103" column="29" selection-start-line="103" selection-start-column="29" selection-end-line="103" selection-end-column="29" />
+        <state vertical-scroll-proportion="0.41284403" vertical-offset="338" max-vertical-offset="1856">
+          <caret line="38" column="54" selection-start-line="38" selection-start-column="54" selection-end-line="294" selection-end-column="17" />
+          <folding>
+            <element signature="tag#script#1;tag#head#0;tag#html#0" expanded="false" />
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#p#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PriorityPreemptive.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33226836" vertical-offset="1248" max-vertical-offset="6144">
+          <caret line="91" column="82" selection-start-line="91" selection-start-column="82" selection-end-line="91" selection-end-column="82" />
           <folding>
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
