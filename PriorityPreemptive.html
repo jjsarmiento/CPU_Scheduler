@@ -1,5 +1,6 @@
 <html>
 <head>
+    <title>Priority Preemptive - Final Project in IOS102A</title>
     <style>
         body {
             font-family : Arial;
@@ -137,10 +138,10 @@
                     i++;
                 }while(pr_done < 4);
 
-                console.log('GANTT LENGTH : '+$('.gantt_block').length);
                 var et_array_p = [];
                 var et_array_e = [];
-                $('.gantt_block').each(function (index) {
+                $('.gantt_block').each(function (index) { // loop through the items of the gantt chart
+                    // put process details in temporary variables
                     var tmp_process = parseFloat($(this).data('process'));
                     var tmp_start = parseFloat($(this).data('start'));
                     var tmp_end = parseFloat($(this).data('end'));
@@ -150,8 +151,10 @@
                     var slctr_wt = $('#P'+tmp_process+'_WT');
                     var inArray = $.inArray(tmp_process, et_array_p);
 
+                    // compute and append the turnaround time
                     slctr_tat.empty().append(tmp_end - tmp_arrival);
 
+                    // compute and append waiting time
                     var curr_wt = slctr_wt.text();
                     if(inArray > -1){
                         slctr_wt.empty().append(parseFloat(curr_wt) + (tmp_start - et_array_e[inArray]));
@@ -163,12 +166,14 @@
                     }
                 });
 
+                // compute average of turnaround time
                 var total_tat = 0;
                 $('.TAT').each(function (index) {
                     total_tat += parseFloat($(this).text());
                 });
                 $('#AVG_TAT').empty().append((parseFloat(total_tat)/$('.TAT').length));
 
+                // compute average of waiting time
                 var total_wt = 0;
                 $('.WT').each(function (index) {
                     total_wt += parseFloat($(this).text());

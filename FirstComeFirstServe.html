@@ -1,5 +1,6 @@
 <html>
 	<head>
+        <title>First Come, First Serve - Final Project in IOS102A</title>
 		<style>
 			body {
 				font-family : Arial;
@@ -32,19 +33,20 @@
 		<script src="js/jquery-3.1.0.min.js"></script>
 		<script>
 			$(document).ready(function(){
-				$('#INIT_COMPUTE').click(function(){
-					if(checkValues()){
-                        var ready_queue = [];   // contains process index
-                        var my_console = $('#cust_console');
-                        var my_gantt_chart = $('#gantt_chart');
-                        var my_colors = [
+                $('input').each(function(){
+                    $(this).val(Math.floor(Math.random() * 10) + 1);
+                });
+				$('#INIT_COMPUTE').click(function(){ // listener for the compute button
+					if(checkValues()){ // checks if the values of the input fields are acceptable (numerical values only)
+                        var ready_queue = []; // variable to contain process that cannot yet go directly to the cpu
+                        var my_gantt_chart = $('#gantt_chart'); // listener for the gantt chart div
+                        var my_colors = [ // array of colors for the gantt chart
                             '#E74C3C',
                             '#8E44AD',
                             '#16A085',
                             '#D35400'
                         ];
 
-                        my_console.empty();
                         my_gantt_chart.empty();
 
                         // populate `ready_queue` array of process via arrival time values
@@ -57,36 +59,32 @@
                         }
 
                         // start processing
-                        var start_time = GET_ARRIVALTIME_LOWEST();
-                        var end_time = 0;
-                        $.each(ready_queue, function(index, value){
-                            // TAT = TF - TA
-                            // WT = TS - TA
-                            var curr_process = 'P'+value;
-                            var curr_arrivaltime = $('[data-process="P'+value+'"][class="arrival_time"]').val();
-                            var curr_bursttime = $('[data-process="P'+value+'"][class="burst_time"]').val();
-//                            var curr_width = (() / parseFloat(curr_bursttime) * 100.00);
-                            var curr_width = (curr_bursttime / parseFloat(GET_BURSTTIME_TOTAL())) * 80;
-                            console.log(curr_width);
-                            var elem_TAT = $('#'+curr_process+'_TAT');
-                            var elem_WT = $('#'+curr_process+'_WT');
+                        var start_time = GET_ARRIVALTIME_LOWEST(); // create and initialize start_time (for individual div of the gantt chart) based on the lowest arrival time existing
+                        var end_time = 0; // create and initialize end_time (for individual div of the gantt chart) to 0 and listen and change for incrementing values
+                        $.each(ready_queue, function(index, value){ // loops through the read_queue variable to get new process
+                            var curr_process = 'P'+value; // get current process on top of queue
+                            var curr_arrivaltime = $('[data-process="P'+value+'"][class="arrival_time"]').val(); // jQuery select the corresponding arrival time of the selected process
+                            var curr_bursttime = $('[data-process="P'+value+'"][class="burst_time"]').val(); // jQuery select the corresponding arrival time of the selected process
+                            var curr_width = (curr_bursttime / parseFloat(GET_BURSTTIME_TOTAL())) * 80; // compute width of the div for the gantt chart
+                            var elem_TAT = $('#'+curr_process+'_TAT'); // jQuery select the Turn-Around Time cell for the current process
+                            var elem_WT = $('#'+curr_process+'_WT'); // jQuery select the Waiting Time cell for the current process
 
-                            // check for CPU STAND BY
-                            if(curr_arrivaltime > start_time){
-                                my_gantt_chart.append('<div class="gantt_block bubble" style="background-color: white; width: 10%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+start_time+' - '+curr_arrivaltime+'</div>');
-                                start_time = parseFloat(curr_arrivaltime);
+                            // check for BUBBLE
+                            if(curr_arrivaltime > start_time){ // if current process' arrival time is GREATER than the start_time then a BUBBLE exists
+                                my_gantt_chart.append('<div class="gantt_block bubble" style="background-color: white; width: 10%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+start_time+' - '+curr_arrivaltime+'</div>'); // append bubble div to gantt chart
+                                start_time = parseFloat(curr_arrivaltime); // re-initialize start_time to the current process' arrival time
                             }
 
-                            end_time = start_time + parseFloat(curr_bursttime);
-                            // create gantt chart
+                            end_time = start_time + parseFloat(curr_bursttime); // compute end_time by adding current process' burst time to start_time
+                            // append process' div to gantt chart
                             my_gantt_chart.append('<div class="gantt_block" style="background-color: '+my_colors[index]+'; width: '+curr_width+'%;">'+curr_process+'<br/>'+start_time+' - '+end_time+'</div>');
-                            // get and append TAT
+                            // compute and append TAT
                             var TAT = end_time - curr_arrivaltime;
                             elem_TAT.empty().append(TAT);
-                            // get and append WT
+                            // compute and append WT
                             var WT = start_time - curr_arrivaltime;
                             elem_WT.empty().append(WT);
-                            start_time = end_time;
+                            start_time = end_time; // re-initialize start_time to end_time value to for the next process starting point or computation of bubble if existing
                         });
 
                         // compute average of TAT

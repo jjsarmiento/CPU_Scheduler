@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>Priority Non-Preemptive - Final Project in IOS102A</title>
         <style>
             body {
                 font-family : Arial;
@@ -57,51 +58,47 @@
             var pr_done = 0;
 
             $(document).ready(function(){
-
                 $('#methods').change(function(){
                     location.href = $(this).val();
-                })
-
+                });
                 $('input').each(function(){
                     $(this).val(Math.floor(Math.random() * 10) + 1);
                 });
-
                 $('#INIT_COMPUTE').click(function () {
-                    if(checkValues()){
-                        i = GET_ARRIVALTIME_LOWEST();
-                        do{
-                            console.log(i);
+                    if(checkValues()){ // check if input is acceptable
+                        i = GET_ARRIVALTIME_LOWEST(); // get lowest arrival time
+                        do{ // used do while - loop only executes when ALL the process are done
                             PROCESS_ARRIVALS(i);
-
-                            if(cpu_process != null){
-                                if(i == GLOBAL_endTime){
+                            if(cpu_process != null){ // check if the cpu process has no ongoing job
+                                if(i == GLOBAL_endTime){ // if the time(i) is equal to GLOBAL_endtime then a process has just ended
                                     var curr_width = (((GLOBAL_endTime - GLOBAL_startTime) / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
                                     $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
-                                    pr_done++;
+                                    pr_done++; // increment pr_done for every finished process
 
+                                    // compute turnaround time and waiting time
                                     var curr_arrivaltime = parseFloat($('[data-process="'+cpu_process+'"][class="arrival_time"]').val());
                                     $('#P'+cpu_process+'_TAT').append(GLOBAL_endTime - curr_arrivaltime);
                                     $('#P'+cpu_process+'_WT').append(GLOBAL_startTime - curr_arrivaltime);
+                                    // reinitialize cpu to null (no job)
                                     cpu_process = null;
                                     cpu_bursttime = null;
                                 }
                             }
 
-                            if(cpu_process == null){
-                                console.log(i+'\t : RQ'+ready_queue.length);
-                                if(ready_queue.length > 0){
+                            if(cpu_process == null){ // check if cpu has no job
+                                if(ready_queue.length > 0){ // check if ready_queue has a job waiting
                                     if(GLOBAL_bubbleStart != null){
                                         var bubble_width = ((i - GLOBAL_bubbleStart) / GET_BURSTTIME_SUM()) * 80;
                                         $('#gantt_chart').append('<div class="bubble" style="background-color: white; width: '+bubble_width+'%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+GLOBAL_bubbleStart+' - '+i+'</div>');
                                         GLOBAL_bubbleStart = null;
                                     }
                                     cpu_process = ready_queue[0].split('?')[0]; // get and put process from ready_queue to temp value
-                                    cpu_bursttime = parseFloat(ready_queue[0].split('?')[1]);
-                                    ready_queue.shift();
-                                    GLOBAL_startTime = i;
-                                    GLOBAL_endTime = GLOBAL_startTime + cpu_bursttime;
-                                }else{
-                                    if(GLOBAL_bubbleStart == null){
+                                    cpu_bursttime = parseFloat(ready_queue[0].split('?')[1]); // get burst time of process
+                                    ready_queue.shift(); // remove contents of index 0 and shift the array
+                                    GLOBAL_startTime = i; // initialize start time of process based on time(i)
+                                    GLOBAL_endTime = GLOBAL_startTime + cpu_bursttime; // compute the end time for the process by adding the burst time to start time
+                                }else{ // if no job waiting in ready_queue AND the cpu has no process, BUBBLE occurs
+                                    if(GLOBAL_bubbleStart == null){ // initialize bubble counter
                                         GLOBAL_bubbleStart = i;
                                     }
                                 }
@@ -112,11 +109,13 @@
                             }
                         }while(pr_done < 4);
 
+                        // compute average of turnaround time
                         var total_TAT = 0;
                         $('.TAT').each(function (index) {
                             total_TAT += parseFloat($(this).text());
                         });
                         $('#AVG_TAT').empty().append((total_TAT/4));
+                        // compute average of waiting time
                         var total_WT = 0;
                         $('.WT').each(function (index) {
                             total_WT += parseFloat($(this).text());

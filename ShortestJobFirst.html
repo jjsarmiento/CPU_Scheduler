@@ -49,17 +49,16 @@
             $('input').each(function(){
                 $(this).val(Math.floor(Math.random() * 10) + 1);
             });
-            $('#INIT_COMPUTE').click(function(){
-                if(checkValues()){
-                    my_console.empty();
-                    my_gantt_chart.empty();
-                    for(var i=0; i <= GET_BURSTTIME_TOTAL(); i++){
-                        // check for arrivals
-                        $('.arrival_time').each(function(index){
-                            var curr_arrival_time = Math.round(parseFloat($(this).val()));
-                            if(curr_arrival_time == parseFloat(i)){
+            $('#INIT_COMPUTE').click(function(){// listener for the compute button
+                if(checkValues()){ // checks if the values of the input fields are acceptable
+                    my_gantt_chart.empty(); // empties the gantt chart div
+                    for(var i=0; i <= GET_BURSTTIME_TOTAL(); i++){ // loop based on the total amount of time that would be consumed based on the process' arrival time
+                        $('.arrival_time').each(function(index){ // check arrival time of all the process
+                            var curr_arrival_time = Math.round(parseFloat($(this).val()));  // parse arrival_time value to float
+                            if(curr_arrival_time == parseFloat(i)){ // compares current_arrival time to loop time if they are equal
                                 var process_number = index+1;
                                 var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
+                                // adds the process that has arrived to the ready_queue array or the FIRST_PROCESS array if process is first to arrive
                                 if(FIRST_PROCESS.length == 0){
                                     FIRST_PROCESS.push(process_number+'?'+curr_bursttime);
                                 }else{
@@ -68,46 +67,47 @@
                             }
                         });
                     }
-                    // sort by burst time
+                    // sort ready_queue by burst time and appends FIRST_PROCESS to the first index of ready_queue
                     ready_queue.sort(function(a,b){
                         return a.split('?')[1] - b.split('?')[1]
                     });
                     ready_queue = FIRST_PROCESS.concat(ready_queue);
-                    console.log(ready_queue);
 
                     // start process
-                    var loop_length = parseFloat(ready_queue.length);
-
+                    var loop_length = parseFloat(ready_queue.length); // computes length of loop
                     my_gantt_chart.empty();
                     for(var o=0; o < loop_length; o++){
-                        var tmp_process = ready_queue[0].split('?')[0];
-                        var tmp_burst = parseFloat(ready_queue[0].split('?')[1]);
-                        ready_queue.shift();
-                        var tmp_at = parseFloat($('[class="arrival_time"][data-process="'+tmp_process+'"]').val());
+                        var tmp_process = ready_queue[0].split('?')[0]; // get process index 0 from queue
+                        var tmp_burst = parseFloat(ready_queue[0].split('?')[1]); // get burst time of process index 0 from queue
+                        ready_queue.shift(); // removes the value from index 0 from ready_queue
+                        var tmp_at = parseFloat($('[class="arrival_time"][data-process="'+tmp_process+'"]').val()); // gets arrival time of the process
 
                         // check for start time initialization
                         if(GLOBAL_startTime == null){
-                            GLOBAL_startTime = tmp_at;
+                            GLOBAL_startTime = tmp_at; // appends current process' arrival_time as start time
                         }
 
-                        // check for waiting time
+                        // check for BUBBLE
                         if(GLOBAL_startTime < tmp_at){
                             $('#gantt_chart').append('<div class="gantt_block bubble" style="background-color: white; width: 10%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+GLOBAL_startTime+' - '+tmp_at+'</div>');
                             GLOBAL_startTime = tmp_at;
                         }
 
+                        // change value of end time
                         GLOBAL_endTime = GLOBAL_startTime + tmp_burst;
 
                         //compute waiting time and tat
-                        var wt = GLOBAL_startTime - tmp_at;/**/
+                        var wt = GLOBAL_startTime - tmp_at;
                         var tat = GLOBAL_endTime - tmp_at;
 
                         $('#P'+tmp_process+'_WT').empty().append(wt);
                         $('#P'+tmp_process+'_TAT').empty().append(tat);
 
-                        var curr_width = ((tmp_burst / GET_BURSTTIME_TOTAL()) * 80);
+                        var curr_width = ((tmp_burst / GET_BURSTTIME_TOTAL()) * 80); // compute width of div for the gantt chart
 
+                        // append to gantt chart
                         $('#gantt_chart').append('<div class="gantt_block" style="background-color: '+my_colors[o]+'; width: '+curr_width+'%;">P'+tmp_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
+                        // re-initialize start time for next iteration of the loop
                         GLOBAL_startTime = GLOBAL_endTime;
                     }
 

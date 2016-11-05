@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>Round Robin - Final Project in IOS102A</title>
 <style>
     body {
         font-family : Arial;
@@ -68,86 +69,57 @@ $(document).ready(function(){
             var i = GET_ARRIVALTIME_LOWEST();
             quantum = $('#quantum').val();
 
-            do{
-                PROCESS_ARRIVALS(i); // insert process to `ready_queue`
-
-                if(cpu_process != null){
-                    cpu_bursttime--; // decrement value
-                    burst_counter++;
-                    console.log(i+'\t: DCRMNT BT : P'+cpu_process+'/'+cpu_bursttime);
-
-                    if(burst_counter == quantum || cpu_bursttime == 0){ // cpu has 0 bt value
+            do{ // do-while loop | loop doesn't end until ALL PROCESS ARE DONE
+                PROCESS_ARRIVALS(i); // function to insert process to `ready_queue`
+                if(cpu_process != null){ // checks if cpu an ongoing job
+                    cpu_bursttime--; // decrement burst time value
+                    burst_counter++; // increment burst counter
+                    if(burst_counter == quantum || cpu_bursttime == 0){ // if cpu has 0 bt value left and if burst_counter is equal to Q (quantum)
                         GLOBAL_endTime = i; // change end time to loop value `i`
-                        var bt_of_process = parseFloat(GLOBAL_endTime - GLOBAL_startTime);
+                        var bt_of_process = parseFloat(GLOBAL_endTime - GLOBAL_startTime); // put burst time into a temporary value
                         var curr_width = ((bt_of_process / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
                         $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
-                        console.log(i+'\t: '+' ADD_GANTT_1 = '+cpu_process+'/'+cpu_bursttime);
-                        if(cpu_bursttime > 0){
-                            ready_queue.push(cpu_process+'?'+cpu_bursttime);
+                        if(cpu_bursttime > 0){ // check if there is cpu burst remaining
+                            ready_queue.push(cpu_process+'?'+cpu_bursttime); // put back process to ready_queue with decreased burst time left
                         }else if(cpu_bursttime == 0){
-                            pr_done++;
+                            pr_done++; // indicate a finished process
                         }
+                        // re-initialize cpu to null (no job)
                         cpu_process = null;
                         cpu_bursttime = null;
 
+                        // re-initialize starttime to time(i) and burst_counter to 0
                         GLOBAL_startTime = i;
                         burst_counter = 0;
                     }
                 }
 
-                if(cpu_process == null){
-                    if(ready_queue.length > 0){
+                if(cpu_process == null){ // check if cpu has no ongoing job
+                    if(ready_queue.length > 0){ // check if there is a job waiting in ready_queue
                         cpu_process = ready_queue[0].split('?')[0];	// add process to cpu
-                        cpu_bursttime = ready_queue[0].split('?')[1];
-                        ready_queue.shift();
-                        GLOBAL_startTime = i;
+                        cpu_bursttime = ready_queue[0].split('?')[1]; // add burst time to cpu
+                        ready_queue.shift(); // shift ready_queue array removing the 0 index
+                        GLOBAL_startTime = i; // initialize start time to correspoding time(i) which is also the arrival time
                         burst_counter = 0;
 
-                        if(GLOBAL_bubbleStart != null){
-                            console.log(i+'\t: BUBBLE END');
-                            var bubble_width = ((i - GLOBAL_bubbleStart) / GET_BURSTTIME_SUM()) * 80;
+                        if(GLOBAL_bubbleStart != null){ // check if bubble time has value (this indicates the END of the bubble)
+                            var bubble_width = ((i - GLOBAL_bubbleStart) / GET_BURSTTIME_SUM()) * 80; // bubble width
                             $('#gantt_chart').append('<div class="bubble" style="background-color: white; width: '+bubble_width+'%; border: 1px solid #333333; color: black;">BUBBLE<br/>'+GLOBAL_bubbleStart+' - '+i+'</div>');
-                            GLOBAL_bubbleStart = null;
+                            GLOBAL_bubbleStart = null; // re-initialize bubble timer to null (indicating no BUBBLE)
                         }
-
-                        console.log(i+'\t: ADD PR to CPU : P'+cpu_process+'/'+cpu_bursttime);
-                    }else{ // bubble
+                    }else{ // initialize bubble value
                         if(GLOBAL_bubbleStart == null){
                             GLOBAL_bubbleStart = i;
                         }
-                        console.log(i+'\t: BUBBLE INC - Start = '+GLOBAL_bubbleStart);
                     }
                 }
-                /*else{
-                    // algo for change process - PREEMPTIVE NATURE
-                    if(ready_queue.length > 0){
-                        var og_temp_pr = ready_queue[0].split('?')[0]; // get and put process from ready_queue to temp value
-                        var og_temp_bt = ready_queue[0].split('?')[1]; // get and put burst time from ready_queue to temp value
-                        if(og_temp_bt < cpu_bursttime){ // determines if cpu will change to lower bt process
-                            GLOBAL_endTime = i; // change end time to loop value `i`
-                            var bt_of_process = parseFloat(GLOBAL_endTime - GLOBAL_startTime); // get burst time of process
-                            var curr_width = ((bt_of_process / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
-                            $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
-                            console.log(i+'\t: '+' ADD_GANTT_2 = '+cpu_process+'/'+cpu_bursttime);
-
-                            // change process
-                            console.log(i+'\t: CHNG PR : P'+cpu_process+'/'+cpu_bursttime+' to '+og_temp_pr+'/'+og_temp_bt);
-                            ready_queue.push(cpu_process+'?'+cpu_bursttime); // put back process from cpu to ready_queue
-                            cpu_process = og_temp_pr; // apply new cpu process
-                            cpu_bursttime = og_temp_bt; // apply new cpu burst time
-                            ready_queue.shift(); // remove applied process from ready_queue
-                            GLOBAL_startTime = i;
-                        }
-                    }
-                }
-                */
                 i++;
             }while(pr_done < 4);
 
-            console.log('GANTT LENGTH : '+$('.gantt_block').length);
             var et_array_p = [];
             var et_array_e = [];
-            $('.gantt_block').each(function (index) {
+            $('.gantt_block').each(function (index) {// loop through the items of the gantt chart
+                // put process details in temporary variables
                 var tmp_process = parseFloat($(this).data('process'));
                 var tmp_start = parseFloat($(this).data('start'));
                 var tmp_end = parseFloat($(this).data('end'));
@@ -157,8 +129,10 @@ $(document).ready(function(){
                 var slctr_wt = $('#P'+tmp_process+'_WT');
                 var inArray = $.inArray(tmp_process, et_array_p);
 
+                // compute and append the turnaround time
                 slctr_tat.empty().append(tmp_end - tmp_arrival);
 
+                // compute and append waiting time
                 var curr_wt = slctr_wt.text();
                 if(inArray > -1){
                     slctr_wt.empty().append(parseFloat(curr_wt) + (tmp_start - et_array_e[inArray]));
@@ -290,7 +264,6 @@ function PROCESS_ARRIVALS(time){
             var process_number = index+1;
             var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
             ready_queue.push(process_number+'?'+curr_bursttime);
-            console.log(time+'\t: PR ARRVD : '+process_number+'/'+curr_bursttime+' | '+ready_queue);
             arrival_flag = true;
         }
     });

@@ -1,5 +1,6 @@
 <html>
 	<head>
+        <title>Shortest Time Remaining - Final Project in IOS102A</title>
 		<style>
             body {
                 font-family : Arial;
@@ -130,18 +131,18 @@
                             i++;
 						}while(pr_done < 4);
 
-                        console.log('GANTT LENGTH : '+$('.gantt_block').length);
                         var et_array_p = [];
                         var et_array_e = [];
-                        $('.gantt_block').each(function (index) {
+                        $('.gantt_block').each(function (index) { // loop through items in the gantt chart for computation of the
+                            // get gantt item's process, start and end time, and arrival time
                             var tmp_process = parseFloat($(this).data('process'));
                             var tmp_start = parseFloat($(this).data('start'));
                             var tmp_end = parseFloat($(this).data('end'));
                             var tmp_arrival = parseFloat($('[data-process="'+(tmp_process)+'"][class="arrival_time"]').val());
-                            // selectors
+                            // selectors for the turnaround time and waiting time
                             var slctr_tat = $('#P'+tmp_process+'_TAT');
                             var slctr_wt = $('#P'+tmp_process+'_WT');
-                            var inArray = $.inArray(tmp_process, et_array_p);
+                            var inArray = $.inArray(tmp_process, et_array_p); // check if the current process is in array
 
                             slctr_tat.empty().append(tmp_end - tmp_arrival);
 
@@ -156,12 +157,14 @@
                             }
                         });
 
+                        // computes average turnaround time
                         var total_tat = 0;
                         $('.TAT').each(function (index) {
                             total_tat += parseFloat($(this).text());
                         });
                         $('#AVG_TAT').empty().append((parseFloat(total_tat)/$('.TAT').length));
 
+                        // computes average waiting time
                         var total_wt = 0;
                         $('.WT').each(function (index) {
                             total_wt += parseFloat($(this).text());
