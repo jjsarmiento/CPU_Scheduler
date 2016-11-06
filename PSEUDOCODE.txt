@@ -1,4 +1,0 @@
-ROUND ROBIN
-do while {
-    if cpu has no process
-}

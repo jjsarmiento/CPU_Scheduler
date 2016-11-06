@@ -59,7 +59,7 @@
 			$(document).ready(function(){
 
                 $('input').each(function(){
-                    $(this).val(Math.floor(Math.random() * 10) + 1);
+                    $(this).val(Math.floor(Math.random() * 50) + 1);
                 });
 
 				$('#INIT_COMPUTE').click(function(){
@@ -143,9 +143,11 @@
                             var slctr_tat = $('#P'+tmp_process+'_TAT');
                             var slctr_wt = $('#P'+tmp_process+'_WT');
                             var inArray = $.inArray(tmp_process, et_array_p); // check if the current process is in array
-
+							
+							// compute and append the turnaround time
                             slctr_tat.empty().append(tmp_end - tmp_arrival);
 
+							// compute and append waiting time
                             var curr_wt = slctr_wt.text();
                             if(inArray > -1){
                                 slctr_wt.empty().append(parseFloat(curr_wt) + (tmp_start - et_array_e[inArray]));

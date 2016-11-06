@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Round Robin - Final Project in IOS102A</title>
+<title>Round RobinXX - Final Project in IOS102A</title>
 <style>
     body {
         font-family : Arial;
@@ -80,6 +80,7 @@ $(document).ready(function(){
                         var curr_width = ((bt_of_process / GET_BURSTTIME_SUM()) * 80); // compute width for gantt chart
                         $('#gantt_chart').append('<div data-process="'+cpu_process+'" data-start="'+GLOBAL_startTime+'" data-end="'+GLOBAL_endTime+'" class="gantt_block" style="background-color: '+my_colors[(cpu_process-1)]+'; width: '+curr_width+'%;">P'+cpu_process+'<br/>'+GLOBAL_startTime+' - '+GLOBAL_endTime+'</div>');
                         if(cpu_bursttime > 0){ // check if there is cpu burst remaining
+                            PROCESS_ARRIVALS(i); // function to insert process to `ready_queue`
                             ready_queue.push(cpu_process+'?'+cpu_bursttime); // put back process to ready_queue with decreased burst time left
                         }else if(cpu_bursttime == 0){
                             pr_done++; // indicate a finished process
@@ -263,8 +264,12 @@ function PROCESS_ARRIVALS(time){
         if(curr_arrival_time == parseFloat(time)){
             var process_number = index+1;
             var curr_bursttime = parseFloat($('[data-process="'+(process_number)+'"][class="burst_time"]').val());
-            ready_queue.push(process_number+'?'+curr_bursttime);
-            arrival_flag = true;
+            if($.inArray(process_number+'?'+curr_bursttime, ready_queue) == -1){
+                ready_queue.push(process_number+'?'+curr_bursttime);
+                arrival_flag = true;
+                console.log(time+' - P'+process_number+' arrived ');
+                console.log(time+' - '+ready_queue);
+            }
         }
     });
     return arrival_flag;
